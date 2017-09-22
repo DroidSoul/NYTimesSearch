@@ -7,11 +7,14 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -43,8 +46,8 @@ import static com.droidsoul.nytimessearch.R.id.rvResults;
 
 public class SearchActivity extends AppCompatActivity implements FilterFragment.onFragmentResult{
 
-    EditText etQuery;
-    Button btnSearch;
+//    EditText etQuery;
+//    Button btnSearch;
     RecyclerView rvResults;
     ArrayList<Article> articles;
 //    ArticleArrayAdapter articleAdapter;
@@ -62,8 +65,8 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
     }
 
     public void setupView() {
-        etQuery = (EditText) findViewById(R.id.etQuery);
-        btnSearch = (Button) findViewById(R.id.btnSearch);
+//        etQuery = (EditText) findViewById(R.id.etQuery);
+ //       btnSearch = (Button) findViewById(R.id.btnSearch);
         rvResults = (RecyclerView) findViewById(R.id.rvResults);
         articles = new ArrayList<>();
         preQuery = new Query();
@@ -89,8 +92,28 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_search, menu);
-        return true;
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_search, menu);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // perform query here
+
+                // workaround to avoid issues with some emulators and keyboard devices firing twice if a keyboard enter is used
+                // see https://code.google.com/p/android/issues/detail?id=24599
+                searchView.clearFocus();
+                searchArticle(query, 0);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -111,11 +134,11 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
         return super.onOptionsItemSelected(item);
     }
 
-    public void onArticleSearch(View view) {
+ /*   public void onArticleSearch(View view) {
         String queryStr = etQuery.getText().toString();
         searchArticle(queryStr, 0);
 
-    }
+    }*/
 
     public void searchArticle(final String queryStr, int page) {
         String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
@@ -150,7 +173,7 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
                     super.onFailure(statusCode, headers, responseString, throwable);
                 }
             });
-            etQuery.setText("");
+ //           etQuery.setText("");
         }
         else if (page > 99) {
             return;
