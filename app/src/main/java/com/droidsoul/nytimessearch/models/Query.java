@@ -10,8 +10,8 @@ import com.loopj.android.http.RequestParams;
  */
 public class Query implements Parcelable {
     String API_KEY = "024e1d6494004a9c99dce62512b54af3";
-    String queryStr;
-    int page;
+//    String queryStr;
+//    int page;
     String sortOrder;
     String newsdeskFilter;
     String beginDate;
@@ -24,7 +24,7 @@ public class Query implements Parcelable {
         this.newsdeskFilter = newsdeskFilter;
     }
 
-    public void setQueryStr(String queryStr) {
+/*   public void setQueryStr(String queryStr) {
         this.queryStr = queryStr;
     }
 
@@ -34,7 +34,7 @@ public class Query implements Parcelable {
 
     public int getPage() {
         return page;
-    }
+    }*/
 
     public String getSortOrder() {
         return sortOrder;
@@ -48,23 +48,23 @@ public class Query implements Parcelable {
         return beginDate;
     }
 
-    public Query(String queryStr, int page, String sortOrder, String newsdeskFilter, String beginDate) {
-        this.queryStr = queryStr;
-        this.page = page;
+    public Query(String sortOrder, String newsdeskFilter, String beginDate) {
+//        this.queryStr = queryStr;
+//        this.page = page;
         this.sortOrder = sortOrder;
         this.newsdeskFilter = newsdeskFilter;
         this.beginDate = beginDate;
     }
     //no filter applied
-    public Query(String queryStr) {
+ /*   public Query(String queryStr) {
         this.queryStr = queryStr;
-    }
+    }*/
 
     public RequestParams getParams() {
         RequestParams params = new RequestParams();
-        params.put("q", queryStr);
+//        params.put("q", queryStr);
         params.put("api-key", API_KEY);
-        params.put("page", page);
+//        params.put("page", page);
         if (sortOrder != null) {
             params.put("sort", sortOrder);
         }
@@ -85,8 +85,8 @@ public class Query implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.API_KEY);
-        dest.writeString(this.queryStr);
-        dest.writeInt(this.page);
+//        dest.writeString(this.queryStr);
+//        dest.writeInt(this.page);
         dest.writeString(this.sortOrder);
         dest.writeString(this.newsdeskFilter);
         dest.writeString(this.beginDate);
@@ -94,8 +94,8 @@ public class Query implements Parcelable {
 
     protected Query(Parcel in) {
         this.API_KEY = in.readString();
-        this.queryStr = in.readString();
-        this.page = in.readInt();
+//        this.queryStr = in.readString();
+//        this.page = in.readInt();
         this.sortOrder = in.readString();
         this.newsdeskFilter = in.readString();
         this.beginDate = in.readString();

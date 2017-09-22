@@ -135,7 +135,7 @@ public class FilterFragment extends DialogFragment implements AdapterView.OnItem
             @Override
             public void onClick(View view) {
                 activityCommander = (onFragmentResult) getActivity();
-                query = new Query(query.getQueryStr(), 0, sortOrder, newsdeskFilter, beginDate);
+                query = new Query(sortOrder, newsdeskFilter, beginDate);
                 activityCommander.returnData(query);
                 dismiss();
             }
