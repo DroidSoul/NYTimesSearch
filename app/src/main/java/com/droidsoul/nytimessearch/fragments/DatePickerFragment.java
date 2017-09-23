@@ -23,11 +23,12 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         String beginDate = getArguments().getString("begin_date");
+        String endDate = getArguments().getString("end_Date");
         Calendar c = Calendar.getInstance();
 
-        int year = beginDate != null ? Integer.valueOf(beginDate.substring(0, 4)) : c.get(Calendar.YEAR);
-        int month = beginDate != null ? Integer.valueOf(beginDate.substring(5, 7)) - 1 : c.get(Calendar.MONTH);
-        int day = beginDate != null ? Integer.valueOf(beginDate.substring(8)) : c.get(Calendar.DAY_OF_MONTH);
+        int year = beginDate != null ? Integer.valueOf(beginDate.substring(0, 4)) : (endDate != null ? Integer.valueOf(endDate.substring(0, 4)) : c.get(Calendar.YEAR));
+        int month = beginDate != null ? Integer.valueOf(beginDate.substring(5, 7)) - 1 : (endDate != null ? Integer.valueOf(endDate.substring(5, 7)) - 1 : c.get(Calendar.MONTH));
+        int day = beginDate != null ? Integer.valueOf(beginDate.substring(8)) : (endDate != null ? Integer.valueOf(endDate.substring(8)) : c.get(Calendar.DAY_OF_MONTH));
 
         return new DatePickerDialog(getActivity(), this, year, month, day);
     }

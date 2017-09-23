@@ -13,6 +13,11 @@ public class Article {
     String webUrl;
     String headline;
     String thumbNail;
+    boolean isTopStories;
+
+    public boolean isTopStories() {
+        return isTopStories;
+    }
 
     public String getWebUrl() {
         return webUrl;
@@ -26,22 +31,22 @@ public class Article {
         return thumbNail;
     }
 
-    public Article(JSONObject jsonObject) throws JSONException {
-        this.webUrl = jsonObject.getString("web_url");
-        this.headline = jsonObject.getJSONObject("headline").getString("main");
+    public Article(JSONObject jsonObject, boolean isTopStories) throws JSONException {
+        this.webUrl = isTopStories ? jsonObject.getString("url"):jsonObject.getString("web_url");
+        this.headline = isTopStories ? jsonObject.getString("abstract"):jsonObject.getJSONObject("headline").getString("main");
         JSONArray multimedia = jsonObject.getJSONArray("multimedia");
         if (multimedia.length() > 0) {
             JSONObject multimediaJson = multimedia.getJSONObject(0);
-            this.thumbNail = "http://www.nytimes.com/" + multimediaJson.get("url");
+            this.thumbNail = isTopStories ? ("" + multimediaJson.get("url")) :("http://www.nytimes.com/" + multimediaJson.get("url"));
         } else {
             this.thumbNail = null;
         }
     }
-    public static ArrayList<Article> fromJSONArray(JSONArray array) {
+    public static ArrayList<Article> fromJSONArray(JSONArray array, boolean isTopStories) {
         ArrayList<Article> results = new ArrayList<>();
         for (int i = 0; i < array.length(); i++) {
             try {
-                results.add(new Article(array.getJSONObject(i)));
+                results.add(new Article(array.getJSONObject(i), isTopStories));
             } catch (JSONException e) {
                 e.printStackTrace();
             }

@@ -15,6 +15,11 @@ public class Query implements Parcelable {
     String sortOrder;
     String newsdeskFilter;
     String beginDate;
+    String endDate;
+
+    public String getEndDate() {
+        return endDate;
+    }
 
     public Query() {
 
@@ -48,12 +53,13 @@ public class Query implements Parcelable {
         return beginDate;
     }
 
-    public Query(String sortOrder, String newsdeskFilter, String beginDate) {
+    public Query(String sortOrder, String newsdeskFilter, String beginDate, String endDate) {
 //        this.queryStr = queryStr;
 //        this.page = page;
         this.sortOrder = sortOrder;
         this.newsdeskFilter = newsdeskFilter;
         this.beginDate = beginDate;
+        this.endDate = endDate;
     }
     //no filter applied
  /*   public Query(String queryStr) {
@@ -74,6 +80,9 @@ public class Query implements Parcelable {
         if (beginDate != null) {
             params.put("begin_date", beginDate);
         }
+        if (endDate != null) {
+            params.put("end_date", endDate);
+        }
         return params;
     }
 
@@ -85,23 +94,21 @@ public class Query implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.API_KEY);
-//        dest.writeString(this.queryStr);
-//        dest.writeInt(this.page);
         dest.writeString(this.sortOrder);
         dest.writeString(this.newsdeskFilter);
         dest.writeString(this.beginDate);
+        dest.writeString(this.endDate);
     }
 
     protected Query(Parcel in) {
         this.API_KEY = in.readString();
-//        this.queryStr = in.readString();
-//        this.page = in.readInt();
         this.sortOrder = in.readString();
         this.newsdeskFilter = in.readString();
         this.beginDate = in.readString();
+        this.endDate = in.readString();
     }
 
-    public static final Parcelable.Creator<Query> CREATOR = new Parcelable.Creator<Query>() {
+    public static final Creator<Query> CREATOR = new Creator<Query>() {
         @Override
         public Query createFromParcel(Parcel source) {
             return new Query(source);

@@ -1,8 +1,11 @@
 package com.droidsoul.nytimessearch;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Movie;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -11,6 +14,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -18,6 +22,7 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -38,6 +43,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.parceler.Parcels;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
@@ -54,14 +60,67 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
     ArticleAdapter articleAdapter;
     StaggeredGridLayoutManager staggeredGridLayoutManager;
     Query preQuery;
+    View parentLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+        parentLayout = findViewById(R.id.toolbar);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setupView();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+//        parentLayout = findViewById(R.id.activity_search);
+        if (!isNetworkAvailable()) {
+            final Snackbar snackBar = Snackbar.make(parentLayout, "no internet", Snackbar.LENGTH_INDEFINITE);;
+            snackBar.setAction("Retry", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    snackBar.dismiss();
+                }
+            });
+            snackBar.show();
+        }
+        else {
+            if (articles.size() == 0) {
+                Snackbar.make(parentLayout, "", Snackbar.LENGTH_LONG)
+                        .setAction("Welcome, Here are your top stories today!", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                            }
+                        })
+                        .show();
+                showTopStories();
+            }
+        }
+    }
+    public void showTopStories() {
+        String topStoriesURL = "https://api.nytimes.com/svc/topstories/v2/home.json";
+        RequestParams params = preQuery.getParams();
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(topStoriesURL, params, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                JSONArray articleJsonResults = null;
+                try {
+                    articleJsonResults = response.getJSONArray("results");
+                    articles.clear();
+                    articles.addAll(Article.fromJSONArray(articleJsonResults, true));
+                    articleAdapter.notifyDataSetChanged();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+            }
+        });
     }
 
     public void setupView() {
@@ -100,9 +159,6 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
             @Override
             public boolean onQueryTextSubmit(String query) {
                 // perform query here
-
-                // workaround to avoid issues with some emulators and keyboard devices firing twice if a keyboard enter is used
-                // see https://code.google.com/p/android/issues/detail?id=24599
                 searchView.clearFocus();
                 searchArticle(query, 0);
                 return true;
@@ -113,6 +169,7 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
                 return false;
             }
         });
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -134,11 +191,23 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
         return super.onOptionsItemSelected(item);
     }
 
- /*   public void onArticleSearch(View view) {
-        String queryStr = etQuery.getText().toString();
-        searchArticle(queryStr, 0);
+    public boolean isOnline() {
+        Runtime runtime = Runtime.getRuntime();
+        try {
+            Process ipProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
+            int     exitValue = ipProcess.waitFor();
+            return (exitValue == 0);
+        } catch (IOException e)          { e.printStackTrace(); }
+        catch (InterruptedException e) { e.printStackTrace(); }
+        return false;
+    }
 
-    }*/
+    private Boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
+    }
 
     public void searchArticle(final String queryStr, int page) {
         String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
@@ -161,7 +230,7 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
                     try {
                         articleJSONResults = response.getJSONObject("response").getJSONArray("docs");
                         articles.clear();
-                        articles.addAll(Article.fromJSONArray(articleJSONResults));
+                        articles.addAll(Article.fromJSONArray(articleJSONResults, false));
                         articleAdapter.notifyDataSetChanged();
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -185,7 +254,7 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
                     JSONArray articleJsonResults = null;
                     try {
                         articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
-                        articles.addAll(Article.fromJSONArray(articleJsonResults));
+                        articles.addAll(Article.fromJSONArray(articleJsonResults, false));
                         int curSize = articleAdapter.getItemCount();
                         articleAdapter.notifyItemRangeInserted(curSize, articles.size() - 1);
                     } catch (JSONException e) {

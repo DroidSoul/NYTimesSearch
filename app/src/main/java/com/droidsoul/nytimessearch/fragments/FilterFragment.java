@@ -28,6 +28,7 @@ import java.lang.invoke.MethodType;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import static com.droidsoul.nytimessearch.R.id.btnReset;
 import static org.parceler.Parcels.unwrap;
 
 /**
@@ -38,16 +39,20 @@ public class FilterFragment extends DialogFragment implements AdapterView.OnItem
     onFragmentResult activityCommander;
     Query query;
     ImageButton ibtnStartDate;
+    ImageButton ibtnEndDate;
     TextView tvStartDate;
+    TextView tvEndDate;
     Spinner spinner;
     CheckBox cbArts;
     CheckBox cbFashion;
     CheckBox cbSports;
     Button btnSave;
+    Button btnReset;
     String sortOrder;
     String beginDate;
+    String endDate;
     String newsdeskFilter;
-    String[] choices = {"oldest", "newest"};
+    String[] choices = {"undefined", "oldest", "newest"};
     // get user selected value from spinner
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -64,6 +69,10 @@ public class FilterFragment extends DialogFragment implements AdapterView.OnItem
         if (tag.equals("begin_date")) {
             beginDate = convertDate(c);
             tvStartDate.setText(beginDate);
+        }
+        else {
+            endDate = convertDate(c);
+            tvEndDate.setText(endDate);
         }
     }
 
@@ -102,19 +111,26 @@ public class FilterFragment extends DialogFragment implements AdapterView.OnItem
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ibtnStartDate = view.findViewById(R.id.ibtnStartDate);
+        ibtnEndDate = view.findViewById(R.id.ibtnEndDate);
         tvStartDate = view.findViewById(R.id.tvStartDate);
+        tvEndDate = view.findViewById(R.id.tvEndDate);
         spinner = view.findViewById(R.id.spinner);
         cbArts = view.findViewById(R.id.cbArts);
         cbFashion = view.findViewById(R.id.cbFashion);
         cbSports = view.findViewById(R.id.cbSports);
         btnSave = view.findViewById(R.id.btnSave);
+        btnReset = view.findViewById(R.id.btnReset);
         query = unwrap(getArguments().getParcelable("query"));
         sortOrder = query.getSortOrder();
         beginDate = query.getBeginDate();
+        endDate = query.getEndDate();
         newsdeskFilter = query.getNewsdeskFilter();
 
         if (beginDate != null) {
             tvStartDate.setText(beginDate);
+        }
+        if (endDate != null) {
+            tvEndDate.setText(endDate);
         }
         ibtnStartDate.setOnClickListener(new View.OnClickListener(){
 
@@ -129,15 +145,45 @@ public class FilterFragment extends DialogFragment implements AdapterView.OnItem
                 df.show(fm, "begin_date");
             }
         });
+        ibtnEndDate.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View view) {
+                FragmentManager fm = getFragmentManager();
+                DatePickerFragment df = new DatePickerFragment();
+                df.setTargetFragment(FilterFragment.this, 700);
+                Bundle args = new Bundle();
+                args.putString("end_date", endDate);
+                df.setArguments(args);
+                df.show(fm, "end_date");
+            }
+        });
+
         setSpinner();
         setCheckBoxer();
         btnSave.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
                 activityCommander = (onFragmentResult) getActivity();
-                query = new Query(sortOrder, newsdeskFilter, beginDate);
+                query = new Query(sortOrder, newsdeskFilter, beginDate, endDate);
                 activityCommander.returnData(query);
                 dismiss();
+            }
+        });
+        btnReset.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                query = new Query();
+                sortOrder = null;
+                beginDate = null;
+                endDate = null;
+                newsdeskFilter = null;
+                tvStartDate.setText(" ");
+                tvEndDate.setText(" ");
+                spinner.setSelection(0);
+                cbArts.setChecked(false);
+                cbFashion.setChecked(false);
+                cbSports.setChecked(false);
             }
         });
     }
@@ -146,14 +192,15 @@ public class FilterFragment extends DialogFragment implements AdapterView.OnItem
         ArrayAdapter aa = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item,choices);
         aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(aa);
-        if (sortOrder != null) {
-            if (sortOrder.equals("oldest")) {
-                spinner.setSelection(0);
-            }
-            else {
+        if (sortOrder == null) {
+            spinner.setSelection(0);
+        }
+        else if (sortOrder.equals("oldest")) {
                 spinner.setSelection(1);
             }
-        }
+        else if (sortOrder.equals("newest")){
+                spinner.setSelection(2);
+            }
     }
 
     public void setCheckBoxer() {
@@ -239,7 +286,5 @@ public class FilterFragment extends DialogFragment implements AdapterView.OnItem
         cbFashion.setOnCheckedChangeListener(checkListener);
         cbSports.setOnCheckedChangeListener(checkListener);
     }
-
-
 
 }
