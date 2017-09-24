@@ -2,7 +2,7 @@
 
 **NYTimes Search** is an android app that allows a user to search for articles on web using simple filters. The app utilizes [New York Times Search API](http://developer.nytimes.com/docs/read/article_search_api_v2).
 
-Time spent: 20** hours spent in total
+Time spent: 25** hours spent in total
 
 ## User Stories
 
@@ -40,9 +40,12 @@ The following **bonus** features are implemented:
 
 The following **additional** features are implemented:
 
-* [ ] List anything else that you can get done to improve the app functionality!
-1, add snackbar at the beginning of activity, though not elegantly
-2, add end datea and reset button
+* [X] List anything else that you can get done to improve the app functionality!
+1, add snackbar at the beginning of app launch while check if interenet is avaialbe. Display different message depending on internet status
+2, if internet is available, add top stroies at the begging of app launch
+3, add end date and reset button in filter fragment
+4, add progress bar
+
 
 ## Video Walkthrough
 
@@ -55,6 +58,9 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 ## Notes
 
 Describe any challenges encountered while building the app.
+
+Took a while to figure out the data format from activity to fragment.Image sizing and relativelayout with lots of itmes are tough. 
+
 
 ## Open-source libraries used
 

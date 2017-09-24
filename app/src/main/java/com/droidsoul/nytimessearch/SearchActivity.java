@@ -27,6 +27,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ProgressBar;
 
 import com.droidsoul.nytimessearch.adapters.ArticleAdapter;
 import com.droidsoul.nytimessearch.adapters.ArticleArrayAdapter;
@@ -61,6 +62,8 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
     StaggeredGridLayoutManager staggeredGridLayoutManager;
     Query preQuery;
     View parentLayout;
+    MenuItem miActionProgressItem;
+//    ProgressBar progressBarFooter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +103,7 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
         }
     }
     public void showTopStories() {
+//        showProgressBar();
         String topStoriesURL = "https://api.nytimes.com/svc/topstories/v2/home.json";
         RequestParams params = preQuery.getParams();
         AsyncHttpClient client = new AsyncHttpClient();
@@ -115,6 +119,7 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+//                hideProgressBar();
             }
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
@@ -128,10 +133,18 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
  //       btnSearch = (Button) findViewById(R.id.btnSearch);
         rvResults = (RecyclerView) findViewById(R.id.rvResults);
         articles = new ArrayList<>();
+//        View footer = getLayoutInflater().inflate(
+//                R.layout.footer_progress, null);
+        // Find the progressbar within footer
+ //       progressBarFooter = (ProgressBar)
+ //               footer.findViewById(R.id.pbFooterLoading);
+        // Add footer to ListView before setting adapter
+//        rvResults.addFooterView(footer);
         preQuery = new Query();
         articleAdapter = new ArticleAdapter(this, articles);
         staggeredGridLayoutManager = new StaggeredGridLayoutManager(4,1);
         rvResults.setLayoutManager(staggeredGridLayoutManager);
+//        rvResults.addFooterView(footer);
         articleAdapter.setOnItemClickListener(new ArticleAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -142,6 +155,7 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
             }
         });
 //        articleAdapter = new ArticleArrayAdapter(this, articles);
+
         rvResults.setAdapter(articleAdapter);
         staggeredGridLayoutManager = new StaggeredGridLayoutManager(2,1);
         rvResults.setLayoutManager(staggeredGridLayoutManager);
@@ -216,6 +230,7 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
         params.put("page", page);
         params.put("q", queryStr);
         if (page == 0) {
+            showProgressBar();
             rvResults.clearOnScrollListeners();
             rvResults.addOnScrollListener(new EndlessRecyclerViewScrollListener(staggeredGridLayoutManager) {
                 @Override
@@ -235,6 +250,7 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                    hideProgressBar();
                 }
 
                 @Override
@@ -248,6 +264,7 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
             return;
         }
         else {
+            showProgressBar();
             client.get(url, params, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -260,6 +277,7 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                    hideProgressBar();
                 }
                 @Override
                 public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
@@ -267,6 +285,26 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
                 }
             });
         }
+
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        miActionProgressItem = menu.findItem(R.id.miActionProgress);
+        // Extract the action-view from the menu item
+        ProgressBar v =  (ProgressBar) MenuItemCompat.getActionView(miActionProgressItem);
+        return super.onPrepareOptionsMenu(menu);
+    }
+    public void showProgressBar() {
+        // Show progress item
+        miActionProgressItem.setVisible(true);
+//        progressBarFooter.setVisibility(View.VISIBLE);
+    }
+
+    public void hideProgressBar() {
+        // Hide progress item
+        miActionProgressItem.setVisible(false);
+//        progressBarFooter.setVisibility(View.GONE);
 
     }
 

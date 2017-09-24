@@ -16,10 +16,12 @@ import android.view.View;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 
 public class ArticleActivity extends AppCompatActivity {
 
     WebView wvArticle;
+    MenuItem miActionProgressItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +34,7 @@ public class ArticleActivity extends AppCompatActivity {
         final String url = getIntent().getStringExtra("url");
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle("mobile.nytimes.com");
+//        showProgressBar();
 //        actionBar.setTitle(url);
         wvArticle.setWebViewClient(new WebViewClient(){
             @Override
@@ -41,6 +44,8 @@ public class ArticleActivity extends AppCompatActivity {
             }
         });
         wvArticle.loadUrl(url);
+
+//        hideProgressBar();
     }
 
     @Override
@@ -59,4 +64,21 @@ public class ArticleActivity extends AppCompatActivity {
         miShare.setShareIntent(shareIntent);
         return super.onCreateOptionsMenu(menu);
     }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+
+        miActionProgressItem = menu.findItem(R.id.miActionProgress);
+        // Extract the action-view from the menu item
+        ProgressBar v =  (ProgressBar) MenuItemCompat.getActionView(miActionProgressItem);
+        return super.onPrepareOptionsMenu(menu);
+    }
+    public void showProgressBar() {
+        // Show progress item
+        miActionProgressItem.setVisible(true);
+    }
+
+    public void hideProgressBar() {
+        // Hide progress item
+        miActionProgressItem.setVisible(false);}
 }
