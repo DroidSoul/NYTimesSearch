@@ -1,4 +1,4 @@
-package com.droidsoul.nytimessearch;
+package com.droidsoul.nytimessearch.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,6 +17,8 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
+
+import com.droidsoul.nytimessearch.R;
 
 public class ArticleActivity extends AppCompatActivity {
 

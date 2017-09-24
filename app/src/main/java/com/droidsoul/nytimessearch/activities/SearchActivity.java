@@ -1,36 +1,26 @@
-package com.droidsoul.nytimessearch;
+package com.droidsoul.nytimessearch.activities;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Movie;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.webkit.WebView;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.GridView;
 import android.widget.ProgressBar;
 
+import com.droidsoul.nytimessearch.R;
 import com.droidsoul.nytimessearch.adapters.ArticleAdapter;
-import com.droidsoul.nytimessearch.adapters.ArticleArrayAdapter;
 import com.droidsoul.nytimessearch.fragments.FilterFragment;
 import com.droidsoul.nytimessearch.models.Article;
 import com.droidsoul.nytimessearch.models.Query;
@@ -42,14 +32,11 @@ import com.loopj.android.http.RequestParams;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.parceler.Parcels;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
-
-import static com.droidsoul.nytimessearch.R.id.rvResults;
 
 public class SearchActivity extends AppCompatActivity implements FilterFragment.onFragmentResult{
 
@@ -70,7 +57,7 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         parentLayout = findViewById(R.id.toolbar);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) parentLayout;
         setSupportActionBar(toolbar);
         setupView();
     }
@@ -80,7 +67,7 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
         super.onStart();
 //        parentLayout = findViewById(R.id.activity_search);
         if (!isNetworkAvailable()) {
-            final Snackbar snackBar = Snackbar.make(parentLayout, "no internet", Snackbar.LENGTH_INDEFINITE);;
+            final Snackbar snackBar = Snackbar.make(parentLayout, "no internet", Snackbar.LENGTH_INDEFINITE);
             snackBar.setAction("Retry", new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -154,12 +141,10 @@ public class SearchActivity extends AppCompatActivity implements FilterFragment.
                 startActivity(i);
             }
         });
-//        articleAdapter = new ArticleArrayAdapter(this, articles);
 
         rvResults.setAdapter(articleAdapter);
         staggeredGridLayoutManager = new StaggeredGridLayoutManager(2,1);
         rvResults.setLayoutManager(staggeredGridLayoutManager);
-//        setupGridViewListener();
     }
 
     @Override
