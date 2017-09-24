@@ -51,7 +51,7 @@ The following **additional** features are implemented:
 
 Here's a walkthrough of implemented user stories:
 
-<img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='https://i.imgur.com/1bsNKz4.gif' title='Video Walkthrough' width='384' alt='Video Walkthrough' />
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
@@ -59,7 +59,8 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
 Describe any challenges encountered while building the app.
 
-Took a while to figure out the data format from activity to fragment.Image sizing and relativelayout with lots of itmes are tough. 
+Took a while to figure out endless scrolling.
+Took some time to settle the data format from activity to fragment.Image sizing and relativelayout with lots of items are tough. 
 
 
 ## Open-source libraries used
